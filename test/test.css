@@ -1,0 +1,34 @@
+@utility utilityName { /* .u-utilityName */
+    test: 123;
+    test2: 345;
+}
+
+@utility utilityName, small { /* .u-sm-utilityName, also medium -> md, large -> lg */
+    test3: 456;
+    test4: 567;
+}
+
+@component ComponentName { /* .ComponentName */
+    test1: 42424;
+    test2: 24242;
+
+    @modifier modifierName { /* .ComponentName--modifierName */
+        test3: 42442;
+        test4: r2525;
+    }
+
+    @descendent descendentName { /* .ComponentName-descendentName */
+        trt: twetze;
+        teasta: tataw;
+    }
+
+    @is stateName { /* .ComponentName.is-stateName */
+        state: stateName;
+    }
+}
+
+@namespace nmsp {
+    @component ComponentName { /* .nmsp-ComponentName */
+
+    }
+}
