@@ -82,6 +82,10 @@ describe('postcss-bem', function () {
             test('@namespace nmsp {@component ComponentName {color: red; text-align: right;}}', '.nmsp-ComponentName {\n    color: red;\n    text-align: right\n}', {}, done);
         });
 
+        it('works after file-level @namespace', function (done) {
+            test('@namespace nmsp; @component ComponentName {color: red; text-align: right;}', '.nmsp-ComponentName {color: red; text-align: right\n}', {}, done);
+        });
+
         it('works with default namespace', function (done) {
             test('@component ComponentName {color: red; text-align: right;}', '.nmmmmsp-ComponentName {color: red; text-align: right\n}', {
                 defaultNamespace: 'nmmmmsp'

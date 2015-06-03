@@ -45,6 +45,8 @@ module.exports = postcss.plugin('postcss-bem', function (opts) {
     }
 
     return function (css, result) {
+        var namespaces = {};
+
         css.eachAtRule('utility', function (utility) {
             var params = postcss.list.comma(utility.params);
             var variant;
@@ -83,8 +85,16 @@ module.exports = postcss.plugin('postcss-bem', function (opts) {
         });
 
         css.eachAtRule('namespace', function (namespace) {
+            var name = namespace.params;
+
+            if (!namespace.nodes) {
+                namespaces[namespace.source.input.file || namespace.source.input.id] = name;
+                namespace.removeSelf();
+                return;
+            }
+
             namespace.eachAtRule('component', function (component) {
-                processComponent(component, namespace.params);
+                processComponent(component, name);
             });
 
             var node = namespace.last;
@@ -96,8 +106,13 @@ module.exports = postcss.plugin('postcss-bem', function (opts) {
         });
 
         css.eachAtRule('component', function (component) {
-            processComponent(component, opts.defaultNamespace);
+            var namespace = opts.defaultNamespace;
+            var id = component.source.input.file || component.source.input.id;
+            if (id in namespaces) {
+                namespace = namespaces[id];
+            }
+
+            processComponent(component, namespace);
         });
-        //process.exit();
     };
 });
