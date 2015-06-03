@@ -27,7 +27,8 @@ module.exports = postcss.plugin('postcss-bem', function (opts) {
                 if(separator) {
                     newRule = postcss.rule({
                         selector: '.' + name + separator + rule.params,
-                        nodes: rule.nodes
+                        nodes: rule.nodes,
+                        source: rule.source
                     });
                     component.parent.insertAfter(last, newRule);
                     last = newRule;
@@ -38,7 +39,8 @@ module.exports = postcss.plugin('postcss-bem', function (opts) {
 
         component.replaceWith(postcss.rule({
             selector: '.' + name,
-            nodes: component.nodes
+            nodes: component.nodes,
+            source: component.source
         }));
     }
 
@@ -75,7 +77,8 @@ module.exports = postcss.plugin('postcss-bem', function (opts) {
 
             utility.replaceWith(postcss.rule({
                 selector: '.' + name,
-                nodes: utility.nodes
+                nodes: utility.nodes,
+                source: utility.source
             }));
         });
 
