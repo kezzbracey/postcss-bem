@@ -96,7 +96,7 @@ module.exports = postcss.plugin('postcss-bem', function (opts) {
         });
 
         css.eachAtRule('component', function (component) {
-            processComponent(component);
+            processComponent(component, opts.defaultNamespace);
         });
         //process.exit();
     };
