@@ -22,7 +22,7 @@
         teasta: tataw;
     }
 
-    @is stateName { /* .ComponentName.is-stateName */
+    @when stateName { /* .ComponentName.is-stateName */
         state: stateName;
     }
 }

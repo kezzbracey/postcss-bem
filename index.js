@@ -20,7 +20,7 @@ module.exports = postcss.plugin('postcss-bem', function (opts) {
                     separator = '--';
                 } else if (rule.name === 'descendent') {
                     separator = '-';
-                } else if (rule.name === 'is') {
+                } else if (rule.name === 'when') {
                     separator = '.';
                 }
 
