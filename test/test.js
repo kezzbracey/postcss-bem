@@ -62,4 +62,54 @@ describe('postcss-bem', function () {
             testWarnings('@utility a, b {}', '.u--a {}', ['Unknown variant: b'], {}, done);
         });
     });
+
+    describe('@namespace', function () {
+        it('should get removed when empty', function (done) {
+            test('@namespace nmsp {}', '', {}, done);
+        });
+    });
+
+    describe('@component', function() {
+        it('works without properties', function (done) {
+            test('@component ComponentName {}', '.ComponentName {}', {}, done);
+        });
+
+        it('works with properties', function (done) {
+            test('@component ComponentName {color: red; text-align: right;}', '.ComponentName {color: red; text-align: right\n}', {}, done);
+        });
+
+        it('works in namespace', function (done) {
+            test('@namespace nmsp {@component ComponentName {color: red; text-align: right;}}', '.nmsp-ComponentName {\n    color: red;\n    text-align: right\n}', {}, done);
+        });
+    });
+
+    describe('@modifier', function() {
+        it('works without properties', function (done) {
+            test('@component ComponentName {@modifier modifierName {}}', '.ComponentName {}\n.ComponentName--modifierName {}', {}, done);
+        });
+
+        it('works with properties', function (done) {
+            test('@component ComponentName {color: red; text-align: right; @modifier modifierName {color: blue; text-align: left;}}', '.ComponentName {color: red; text-align: right\n}\n.ComponentName--modifierName {color: blue; text-align: left\n}', {}, done);
+        });
+    });
+
+    describe('@descendent', function() {
+        it('works without properties', function (done) {
+            test('@component ComponentName {@descendent descendentName {}}', '.ComponentName {}\n.ComponentName-descendentName {}', {}, done);
+        });
+
+        it('works with properties', function (done) {
+            test('@component ComponentName {color: red; text-align: right; @descendent descendentName {color: blue; text-align: left;}}', '.ComponentName {color: red; text-align: right\n}\n.ComponentName-descendentName {color: blue; text-align: left\n}', {}, done);
+        });
+    });
+
+    describe('@when', function() {
+        it('works without properties', function (done) {
+            test('@component ComponentName {@when stateName {}}', '.ComponentName {}\n.ComponentName.is-stateName {}', {}, done);
+        });
+
+        it('works with properties', function (done) {
+            test('@component ComponentName {color: red; text-align: right; @when stateName {color: blue; text-align: left;}}', '.ComponentName {color: red; text-align: right\n}\n.ComponentName.is-stateName {color: blue; text-align: left\n}', {}, done);
+        });
+    });
 });
