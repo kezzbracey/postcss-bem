@@ -7,14 +7,64 @@
 [ci]:      https://travis-ci.org/ileri/postcss-bem
 
 ```css
-.foo {
-    /* Input example */
+@utility utilityName {
+    color: green;
+}
+
+@utility utilityName, small {
+    color: blue;
+}
+
+@component ComponentName {
+    color: cyan;
+
+    @modifier modifierName {
+        color: yellow;
+    }
+
+    @descendent descendentName {
+        color: navy;
+    }
+
+    @when stateName {
+        color: crimson;
+    }
+}
+
+@namespace nmsp {
+    @component ComponentName {
+        color: red;
+    }
 }
 ```
 
 ```css
-.foo {
-  /* Output example */
+.u-utilityName {
+    color: green;
+}
+
+.u-sm-utilityName {
+    color: blue;
+}
+
+.ComponentName {
+    color: cyan;
+}
+
+.ComponentName--modifierName {
+    color: yellow;
+}
+
+.ComponentName-descendentName {
+    color: navy;
+}
+
+.ComponentName.is-stateName {
+    color: crimson;
+}
+
+.nmsp-ComponentName {
+    color: red;
 }
 ```
 
