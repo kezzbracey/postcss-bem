@@ -11,7 +11,7 @@
     color: green;
 }
 
-@utility utilityName, small {
+@utility utilityName small {
     color: blue;
 }
 

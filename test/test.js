@@ -34,32 +34,42 @@ function testWarnings (input, output, warnings, opts, done) {
 
 describe('postcss-bem', function () {
     describe('@utility', function() {
-        it('works with name only', function (done) {
+        it('works with name', function (done) {
             test('@utility utilityName {}', '.u-utilityName {}', {}, done);
         });
 
+        it('works with multiple names', function (done) {
+            test('@utility utilityName1, utilityName2 {}', '.u-utilityName1, .u-utilityName2 {}', {}, done);
+        });
+
         it('works with small', function(done) {
-            test('@utility utilityName, small {}', '.u-sm-utilityName {}', {}, done);
+            test('@utility utilityName small {}', '.u-sm-utilityName {}', {}, done);
         });
 
         it('works with medium', function(done) {
-            test('@utility utilityName, medium {}', '.u-md-utilityName {}', {}, done);
+            test('@utility utilityName medium {}', '.u-md-utilityName {}', {}, done);
         });
 
         it('works with large', function(done) {
-            test('@utility utilityName, large {}', '.u-lg-utilityName {}', {}, done);
+            test('@utility utilityName large {}', '.u-lg-utilityName {}', {}, done);
+        });
+
+        it('works with multiple names and sizes', function(done) {
+            test('@utility utilityName1 small, utilityName2 medium, utilityName3 large {}',
+                '.u-sm-utilityName1, .u-md-utilityName2, .u-lg-utilityName3 {}',
+                {}, done);
         });
 
         it('warns when no args are supplied', function(done) {
-            testWarnings('@utility {}', '.u- {}', ['Wrong param count for @utility'], {}, done);
+            testWarnings('@utility {}', '.u- {}', ['No names supplied to @utility'], {}, done);
         });
 
         it('warns when too many args are supplied', function(done) {
-            testWarnings('@utility a, small, c {}', '.u-sm-a {}', ['Wrong param count for @utility'], {}, done);
+            testWarnings('@utility a small c {}', '.u-sm-a {}', ['Wrong param count for @utility'], {}, done);
         });
 
         it('warns when two args are supplied, the second of which is not allowed', function(done) {
-            testWarnings('@utility a, b {}', '.u--a {}', ['Unknown variant: b'], {}, done);
+            testWarnings('@utility a b {}', '.u--a {}', ['Unknown variant: b'], {}, done);
         });
     });
 

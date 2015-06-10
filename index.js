@@ -48,37 +48,55 @@ module.exports = postcss.plugin('postcss-bem', function (opts) {
         var namespaces = {};
 
         css.eachAtRule('utility', function (utility) {
-            var params = postcss.list.comma(utility.params);
-            var variant;
-            var name;
+            var utilities = postcss.list.comma(utility.params);
 
-            if (params.length === 1 && !params[0] || params.length > 2) {
-                result.warn('Wrong param count for @utility', {
+            if (utilities.length === 1 && !utilities[0]) {
+                result.warn('No names supplied to @utility', {
                     node: utility
                 });
+
+                utility.replaceWith(postcss.rule({
+                    selector: '.u-',
+                    nodes: utility.nodes,
+                    source: utility.source
+                }));
+                return;
             }
 
-            name = 'u-';
-            if (params.length > 1) {
-                variant = params[1];
+            var selectors = utilities.map(function (params) {
+                params = postcss.list.space(params);
+                var variant;
+                var name;
 
-                if (variant === 'small') {
-                    name += 'sm';
-                } else if (variant === 'medium') {
-                    name += 'md';
-                } else if (variant === 'large') {
-                    name += 'lg';
-                } else {
-                    result.warn('Unknown variant: ' + variant, {
+                if (params.length === 1 && !params[0] || params.length > 2) {
+                    result.warn('Wrong param count for @utility', {
                         node: utility
                     });
                 }
-                name += '-';
-            }
-            name += params[0];
+
+                name = 'u-';
+                if (params.length > 1) {
+                    variant = params[1];
+
+                    if (variant === 'small') {
+                        name += 'sm';
+                    } else if (variant === 'medium') {
+                        name += 'md';
+                    } else if (variant === 'large') {
+                        name += 'lg';
+                    } else {
+                        result.warn('Unknown variant: ' + variant, {
+                            node: utility
+                        });
+                    }
+                    name += '-';
+                }
+                name += params[0];
+                return '.' + name;
+            });
 
             utility.replaceWith(postcss.rule({
-                selector: '.' + name,
+                selector: selectors.join(', '),
                 nodes: utility.nodes,
                 source: utility.source
             }));
