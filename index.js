@@ -54,16 +54,7 @@ module.exports = postcss.plugin('postcss-bem', function (opts) {
             var utilities = postcss.list.comma(utility.params);
 
             if (utilities.length === 1 && !utilities[0]) {
-                result.warn('No names supplied to @utility', {
-                    node: utility
-                });
-
-                utility.replaceWith(postcss.rule({
-                    selector: '.u-',
-                    nodes: utility.nodes,
-                    source: utility.source
-                }));
-                return;
+                throw utility.error('No names supplied to @utility');
             }
 
             var selectors = utilities.map(function (params) {

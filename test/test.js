@@ -70,8 +70,8 @@ describe('postcss-bem', function () {
                 {}, done);
         });
 
-        it('warns when no args are supplied', function(done) {
-            testWarnings('@utility {}', '.u- {}', ['No names supplied to @utility'], {}, done);
+        it('throws when no args are supplied', function(done) {
+            testErrors('@utility {}', 'No names supplied to @utility', {}, done);
         });
 
         it('warns when too many args are supplied', function(done) {
