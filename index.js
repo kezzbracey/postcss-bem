@@ -24,8 +24,6 @@ module.exports = postcss.plugin('postcss-bem', function (opts) {
                     separator = '--';
                 } else if (rule.name === 'descendent') {
                     separator = '-';
-                } else if (rule.name === 'when') {
-                    separator = '.is-';
                 }
 
                 if(separator) {
@@ -136,6 +134,32 @@ module.exports = postcss.plugin('postcss-bem', function (opts) {
             }
 
             processComponent(component, namespace);
+        });
+
+        css.eachAtRule('when', function (when) {
+            var parent = when.parent;
+
+            if (parent === css || parent.type !== 'rule') {
+                throw when.error('@when can only be used in rules which are not the root node');
+            }
+
+            var states = when.params;
+            var newSelector = postcss.list.comma(parent.selector).map(function (selector) {
+                return postcss.list.comma(states).map(function (state) {
+                    return selector + '.is-' + state;
+                }).join(', ');
+            }).join(', ');
+
+            var newWhen = postcss.rule({
+                selector: newSelector,
+                source: when.source
+            });
+
+            when.each(function (node) {
+                node.moveTo(newWhen);
+            });
+            newWhen.moveAfter(parent);
+            when.removeSelf();
         });
     };
 });

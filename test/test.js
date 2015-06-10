@@ -32,6 +32,16 @@ function testWarnings (input, output, warnings, opts, done) {
     });
 }
 
+function testErrors (input, reason, opts, done) {
+    process(input, opts).then(function () {
+        done(new Error('No errors thrown'));
+    }).catch(function (error) {
+        expect(error.constructor.name).to.be.equal('CssSyntaxError');
+        expect(reason).to.be.equal(error.reason);
+        done();
+    });
+}
+
 describe('postcss-bem', function () {
     describe('@utility', function() {
         it('works with name', function (done) {
@@ -136,6 +146,14 @@ describe('postcss-bem', function () {
 
         it('works with properties', function (done) {
             test('@component ComponentName {color: red; text-align: right; @when stateName {color: blue; text-align: left;}}', '.ComponentName {\n    color: red;\n    text-align: right\n}\n.ComponentName.is-stateName {\n    color: blue;\n    text-align: left\n}', {}, done);
+        });
+
+        it('can be used in any selector', function (done) {
+            test('.ComponentName {color: red; text-align: right; @when stateName {color: blue; text-align: left;}}', '.ComponentName {color: red; text-align: right}\n.ComponentName.is-stateName {color: blue;text-align: left}', {}, done);
+        });
+
+        it('can not be used in root', function (done) {
+            testErrors('@when stateName {color: blue; text-align: left;}', '@when can only be used in rules which are not the root node', {}, done);
         });
     });
 });
