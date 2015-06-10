@@ -85,7 +85,7 @@ describe('postcss-bem', function () {
         });
 
         it('works with properties', function (done) {
-            test('@component ComponentName {color: red; text-align: right;}', '.ComponentName {color: red; text-align: right\n}', {}, done);
+            test('@component ComponentName {color: red; text-align: right;}', '.ComponentName {\n    color: red;\n    text-align: right\n}', {}, done);
         });
 
         it('works in @namespace', function (done) {
@@ -93,11 +93,11 @@ describe('postcss-bem', function () {
         });
 
         it('works after file-level @namespace', function (done) {
-            test('@namespace nmsp; @component ComponentName {color: red; text-align: right;}', '.nmsp-ComponentName {color: red; text-align: right\n}', {}, done);
+            test('@namespace nmsp; @component ComponentName {color: red; text-align: right;}', '.nmsp-ComponentName {\n    color: red;\n    text-align: right\n}', {}, done);
         });
 
         it('works with default namespace', function (done) {
-            test('@component ComponentName {color: red; text-align: right;}', '.nmmmmsp-ComponentName {color: red; text-align: right\n}', {
+            test('@component ComponentName {color: red; text-align: right;}', '.nmmmmsp-ComponentName {\n    color: red;\n    text-align: right\n}', {
                 defaultNamespace: 'nmmmmsp'
             }, done);
         });
@@ -115,7 +115,7 @@ describe('postcss-bem', function () {
         });
 
         it('works with properties', function (done) {
-            test('@component ComponentName {color: red; text-align: right; @modifier modifierName {color: blue; text-align: left;}}', '.ComponentName {color: red; text-align: right\n}\n.ComponentName--modifierName {color: blue;text-align: left\n}', {}, done);
+            test('@component ComponentName {color: red; text-align: right; @modifier modifierName {color: blue; text-align: left;}}', '.ComponentName {\n    color: red;\n    text-align: right\n}\n.ComponentName--modifierName {\n    color: blue;\n    text-align: left\n}', {}, done);
         });
     });
 
@@ -125,7 +125,7 @@ describe('postcss-bem', function () {
         });
 
         it('works with properties', function (done) {
-            test('@component ComponentName {color: red; text-align: right; @descendent descendentName {color: blue; text-align: left;}}', '.ComponentName {color: red; text-align: right\n}\n.ComponentName-descendentName {color: blue;text-align: left\n}', {}, done);
+            test('@component ComponentName {color: red; text-align: right; @descendent descendentName {color: blue; text-align: left;}}', '.ComponentName {\n    color: red;\n    text-align: right\n}\n.ComponentName-descendentName {\n    color: blue;\n    text-align: left\n}', {}, done);
         });
     });
 
@@ -135,7 +135,7 @@ describe('postcss-bem', function () {
         });
 
         it('works with properties', function (done) {
-            test('@component ComponentName {color: red; text-align: right; @when stateName {color: blue; text-align: left;}}', '.ComponentName {color: red; text-align: right\n}\n.ComponentName.is-stateName {color: blue;text-align: left\n}', {}, done);
+            test('@component ComponentName {color: red; text-align: right; @when stateName {color: blue; text-align: left;}}', '.ComponentName {\n    color: red;\n    text-align: right\n}\n.ComponentName.is-stateName {\n    color: blue;\n    text-align: left\n}', {}, done);
         });
     });
 });

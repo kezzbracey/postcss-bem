@@ -11,6 +11,10 @@ module.exports = postcss.plugin('postcss-bem', function (opts) {
         }
 
         var last = component;
+        var newComponent = postcss.rule({
+            selector: '.' + name,
+            source: component.source
+        });
         component.each(function (rule) {
             var separator;
             var newRule;
@@ -37,13 +41,12 @@ module.exports = postcss.plugin('postcss-bem', function (opts) {
                     rule.removeSelf();
                 }
             }
+            if (!separator) {
+                rule.moveTo(newComponent);
+            }
         });
 
-        component.replaceWith(postcss.rule({
-            selector: '.' + name,
-            nodes: component.nodes,
-            source: component.source
-        }));
+        component.replaceWith(newComponent);
     }
 
     return function (css, result) {
