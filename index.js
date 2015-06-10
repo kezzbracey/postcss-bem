@@ -27,8 +27,10 @@ module.exports = postcss.plugin('postcss-bem', function (opts) {
                 if(separator) {
                     newRule = postcss.rule({
                         selector: '.' + name + separator + rule.params,
-                        nodes: rule.nodes,
                         source: rule.source
+                    });
+                    rule.each(function (node) {
+                        node.moveTo(newRule);
                     });
                     component.parent.insertAfter(last, newRule);
                     last = newRule;
