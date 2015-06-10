@@ -51,19 +51,19 @@ module.exports = postcss.plugin('postcss-bem', function (opts) {
         var namespaces = {};
 
         css.eachAtRule('utility', function (utility) {
-            var utilities = postcss.list.comma(utility.params);
-
-            if (utilities.length === 1 && !utilities[0]) {
+            if (!utility.params) {
                 throw utility.error('No names supplied to @utility');
             }
 
-            var selectors = utilities.map(function (params) {
+            var utilityNames = postcss.list.comma(utility.params);
+
+            var selector = utilityNames.map(function (params) {
                 params = postcss.list.space(params);
                 var variant;
                 var name;
 
-                if (params.length === 1 && !params[0] || params.length > 2) {
-                    result.warn('Wrong param count for @utility', {
+                if (params.length > 2) {
+                    result.warn('Too many parameters for @utility', {
                         node: utility
                     });
                 }
@@ -87,13 +87,17 @@ module.exports = postcss.plugin('postcss-bem', function (opts) {
                 }
                 name += params[0];
                 return '.' + name;
+            }).join(', ');
+
+            var newUtility = postcss.rule({
+                selector: selector,
+                source: utility.source
             });
 
-            utility.replaceWith(postcss.rule({
-                selector: selectors.join(', '),
-                nodes: utility.nodes,
-                source: utility.source
-            }));
+            utility.each(function (node) {
+                node.moveTo(newUtility);
+            });
+            utility.replaceWith(newUtility);
         });
 
         css.eachAtRule('namespace', function (namespace) {

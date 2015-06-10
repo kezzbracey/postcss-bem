@@ -75,7 +75,7 @@ describe('postcss-bem', function () {
         });
 
         it('warns when too many args are supplied', function(done) {
-            testWarnings('@utility a small c {}', '.u-sm-a {}', ['Wrong param count for @utility'], {}, done);
+            testWarnings('@utility a small c {}', '.u-sm-a {}', ['Too many parameters for @utility'], {}, done);
         });
 
         it('warns when two args are supplied, the second of which is not allowed', function(done) {
