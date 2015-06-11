@@ -43,117 +43,195 @@ function testErrors (input, reason, opts, done) {
 }
 
 describe('postcss-bem', function () {
-    describe('@utility', function() {
-        it('works with name', function (done) {
-            test('@utility utilityName {}', '.u-utilityName {}', {}, done);
+    describe('suit', function () {
+        describe('@utility', function() {
+            it('works with name', function (done) {
+                test('@utility utilityName {}', '.u-utilityName {}', {}, done);
+            });
+
+            it('works with multiple names', function (done) {
+                test('@utility utilityName1, utilityName2 {}', '.u-utilityName1, .u-utilityName2 {}', {}, done);
+            });
+
+            it('works with small', function(done) {
+                test('@utility utilityName small {}', '.u-sm-utilityName {}', {}, done);
+            });
+
+            it('works with medium', function(done) {
+                test('@utility utilityName medium {}', '.u-md-utilityName {}', {}, done);
+            });
+
+            it('works with large', function(done) {
+                test('@utility utilityName large {}', '.u-lg-utilityName {}', {}, done);
+            });
+
+            it('works with multiple names and sizes', function(done) {
+                test('@utility utilityName1 small, utilityName2 medium, utilityName3 large {}',
+                    '.u-sm-utilityName1, .u-md-utilityName2, .u-lg-utilityName3 {}',
+                    {}, done);
+            });
+
+            it('throws when no args are supplied', function(done) {
+                testErrors('@utility {}', 'No names supplied to @utility', {}, done);
+            });
+
+            it('warns when too many args are supplied', function(done) {
+                testWarnings('@utility a small c {}', '.u-sm-a {}', ['Too many parameters for @utility'], {}, done);
+            });
+
+            it('warns when two args are supplied, the second of which is not allowed', function(done) {
+                testWarnings('@utility a b {}', '.u--a {}', ['Unknown variant: b'], {}, done);
+            });
         });
 
-        it('works with multiple names', function (done) {
-            test('@utility utilityName1, utilityName2 {}', '.u-utilityName1, .u-utilityName2 {}', {}, done);
+        describe('@component-namespace', function () {
+            it('should get removed when empty', function (done) {
+                test('@component-namespace nmsp {}', '', {}, done);
+            });
         });
 
-        it('works with small', function(done) {
-            test('@utility utilityName small {}', '.u-sm-utilityName {}', {}, done);
+        describe('@component', function() {
+            it('works without properties', function (done) {
+                test('@component ComponentName {}', '.ComponentName {}', {}, done);
+            });
+
+            it('works with properties', function (done) {
+                test('@component ComponentName {color: red; text-align: right;}', '.ComponentName {\n    color: red;\n    text-align: right\n}', {}, done);
+            });
+
+            it('works in @component-namespace', function (done) {
+                test('@component-namespace nmsp {@component ComponentName {color: red; text-align: right;}}', '.nmsp-ComponentName {\n    color: red;\n    text-align: right\n}', {}, done);
+            });
+
+            it('works after file-level @component-namespace', function (done) {
+                test('@component-namespace nmsp; @component ComponentName {color: red; text-align: right;}', '.nmsp-ComponentName {\n    color: red;\n    text-align: right\n}', {}, done);
+            });
+
+            it('works with default namespace', function (done) {
+                test('@component ComponentName {color: red; text-align: right;}', '.nmmmmsp-ComponentName {\n    color: red;\n    text-align: right\n}', {
+                    defaultNamespace: 'nmmmmsp'
+                }, done);
+            });
+
+            it('works in @component-namespace with default namespace', function (done) {
+                test('@component-namespace nmsp {@component ComponentName {color: red; text-align: right;}}', '.nmsp-ComponentName {\n    color: red;\n    text-align: right\n}', {
+                    defaultNamespace: 'nmmmmsp'
+                }, done);
+            });
         });
 
-        it('works with medium', function(done) {
-            test('@utility utilityName medium {}', '.u-md-utilityName {}', {}, done);
+        describe('@modifier', function() {
+            it('works without properties', function (done) {
+                test('@component ComponentName {@modifier modifierName {}}', '.ComponentName {}\n.ComponentName--modifierName {}', {}, done);
+            });
+
+            it('works with properties', function (done) {
+                test('@component ComponentName {color: red; text-align: right; @modifier modifierName {color: blue; text-align: left;}}', '.ComponentName {\n    color: red;\n    text-align: right\n}\n.ComponentName--modifierName {\n    color: blue;\n    text-align: left\n}', {}, done);
+            });
         });
 
-        it('works with large', function(done) {
-            test('@utility utilityName large {}', '.u-lg-utilityName {}', {}, done);
+        describe('@descendent', function() {
+            it('works without properties', function (done) {
+                test('@component ComponentName {@descendent descendentName {}}', '.ComponentName {}\n.ComponentName-descendentName {}', {}, done);
+            });
+
+            it('works with properties', function (done) {
+                test('@component ComponentName {color: red; text-align: right; @descendent descendentName {color: blue; text-align: left;}}', '.ComponentName {\n    color: red;\n    text-align: right\n}\n.ComponentName-descendentName {\n    color: blue;\n    text-align: left\n}', {}, done);
+            });
         });
 
-        it('works with multiple names and sizes', function(done) {
-            test('@utility utilityName1 small, utilityName2 medium, utilityName3 large {}',
-                '.u-sm-utilityName1, .u-md-utilityName2, .u-lg-utilityName3 {}',
-                {}, done);
-        });
+        describe('@when', function() {
+            it('works without properties', function (done) {
+                test('@component ComponentName {@when stateName {}}', '.ComponentName {}\n.ComponentName.is-stateName {}', {}, done);
+            });
 
-        it('throws when no args are supplied', function(done) {
-            testErrors('@utility {}', 'No names supplied to @utility', {}, done);
-        });
+            it('works with properties', function (done) {
+                test('@component ComponentName {color: red; text-align: right; @when stateName {color: blue; text-align: left;}}', '.ComponentName {\n    color: red;\n    text-align: right\n}\n.ComponentName.is-stateName {\n    color: blue;\n    text-align: left\n}', {}, done);
+            });
 
-        it('warns when too many args are supplied', function(done) {
-            testWarnings('@utility a small c {}', '.u-sm-a {}', ['Too many parameters for @utility'], {}, done);
-        });
+            it('can be used in any selector', function (done) {
+                test('.ComponentName {color: red; text-align: right; @when stateName {color: blue; text-align: left;}}', '.ComponentName {color: red; text-align: right}\n.ComponentName.is-stateName {color: blue;text-align: left}', {}, done);
+            });
 
-        it('warns when two args are supplied, the second of which is not allowed', function(done) {
-            testWarnings('@utility a b {}', '.u--a {}', ['Unknown variant: b'], {}, done);
+            it('can not be used in root', function (done) {
+                testErrors('@when stateName {color: blue; text-align: left;}', '@when can only be used in rules which are not the root node', {}, done);
+            });
         });
     });
 
-    describe('@component-namespace', function () {
-        it('should get removed when empty', function (done) {
-            test('@component-namespace nmsp {}', '', {}, done);
-        });
-    });
+    describe('bem', function () {
+        var useBem = {
+            style: 'bem'
+        };
 
-    describe('@component', function() {
-        it('works without properties', function (done) {
-            test('@component ComponentName {}', '.ComponentName {}', {}, done);
-        });
-
-        it('works with properties', function (done) {
-            test('@component ComponentName {color: red; text-align: right;}', '.ComponentName {\n    color: red;\n    text-align: right\n}', {}, done);
+        describe('@utility', function() {
+            it('does nothing', function (done) {
+                test('@utility utilityName {}', '@utility utilityName {}', useBem, done);
+            });
         });
 
-        it('works in @component-namespace', function (done) {
-            test('@component-namespace nmsp {@component ComponentName {color: red; text-align: right;}}', '.nmsp-ComponentName {\n    color: red;\n    text-align: right\n}', {}, done);
+        describe('@component-namespace', function () {
+            it('should get removed when empty', function (done) {
+                test('@component-namespace nmsp {}', '', useBem, done);
+            });
         });
 
-        it('works after file-level @component-namespace', function (done) {
-            test('@component-namespace nmsp; @component ComponentName {color: red; text-align: right;}', '.nmsp-ComponentName {\n    color: red;\n    text-align: right\n}', {}, done);
+        describe('@component', function() {
+            it('works without properties', function (done) {
+                test('@component component-name {}', '.component-name {}', useBem, done);
+            });
+
+            it('works with properties', function (done) {
+                test('@component component-name {color: red; text-align: right;}', '.component-name {\n    color: red;\n    text-align: right\n}', useBem, done);
+            });
+
+            it('works in @component-namespace', function (done) {
+                test('@component-namespace nmsp {@component component-name {color: red; text-align: right;}}', '.nmsp--component-name {\n    color: red;\n    text-align: right\n}', useBem, done);
+            });
+
+            it('works after file-level @component-namespace', function (done) {
+                test('@component-namespace nmsp; @component component-name {color: red; text-align: right;}', '.nmsp--component-name {\n    color: red;\n    text-align: right\n}', useBem, done);
+            });
+
+            it('works with default namespace', function (done) {
+                test('@component component-name {color: red; text-align: right;}', '.nmmmmsp--component-name {\n    color: red;\n    text-align: right\n}', {
+                    defaultNamespace: 'nmmmmsp',
+                    style: 'bem'
+                }, done);
+            });
+
+            it('works in @component-namespace with default namespace', function (done) {
+                test('@component-namespace nmsp {@component component-name {color: red; text-align: right;}}', '.nmsp--component-name {\n    color: red;\n    text-align: right\n}', {
+                    defaultNamespace: 'nmmmmsp',
+                    style: 'bem'
+                }, done);
+            });
         });
 
-        it('works with default namespace', function (done) {
-            test('@component ComponentName {color: red; text-align: right;}', '.nmmmmsp-ComponentName {\n    color: red;\n    text-align: right\n}', {
-                defaultNamespace: 'nmmmmsp'
-            }, done);
+        describe('@modifier', function() {
+            it('works without properties', function (done) {
+                test('@component component-name {@modifier modifier-name {}}', '.component-name {}\n.component-name_modifier-name {}', useBem, done);
+            });
+
+            it('works with properties', function (done) {
+                test('@component component-name {color: red; text-align: right; @modifier modifier-name {color: blue; text-align: left;}}', '.component-name {\n    color: red;\n    text-align: right\n}\n.component-name_modifier-name {\n    color: blue;\n    text-align: left\n}', useBem, done);
+            });
         });
 
-        it('works in @component-namespace with default namespace', function (done) {
-            test('@component-namespace nmsp {@component ComponentName {color: red; text-align: right;}}', '.nmsp-ComponentName {\n    color: red;\n    text-align: right\n}', {
-                defaultNamespace: 'nmmmmsp'
-            }, done);
-        });
-    });
+        describe('@descendent', function() {
+            it('works without properties', function (done) {
+                test('@component component-name {@descendent descendent-name {}}', '.component-name {}\n.component-name__descendent-name {}', useBem, done);
+            });
 
-    describe('@modifier', function() {
-        it('works without properties', function (done) {
-            test('@component ComponentName {@modifier modifierName {}}', '.ComponentName {}\n.ComponentName--modifierName {}', {}, done);
+            it('works with properties', function (done) {
+                test('@component component-name {color: red; text-align: right; @descendent descendent-name {color: blue; text-align: left;}}', '.component-name {\n    color: red;\n    text-align: right\n}\n.component-name__descendent-name {\n    color: blue;\n    text-align: left\n}', useBem, done);
+            });
         });
 
-        it('works with properties', function (done) {
-            test('@component ComponentName {color: red; text-align: right; @modifier modifierName {color: blue; text-align: left;}}', '.ComponentName {\n    color: red;\n    text-align: right\n}\n.ComponentName--modifierName {\n    color: blue;\n    text-align: left\n}', {}, done);
-        });
-    });
-
-    describe('@descendent', function() {
-        it('works without properties', function (done) {
-            test('@component ComponentName {@descendent descendentName {}}', '.ComponentName {}\n.ComponentName-descendentName {}', {}, done);
-        });
-
-        it('works with properties', function (done) {
-            test('@component ComponentName {color: red; text-align: right; @descendent descendentName {color: blue; text-align: left;}}', '.ComponentName {\n    color: red;\n    text-align: right\n}\n.ComponentName-descendentName {\n    color: blue;\n    text-align: left\n}', {}, done);
-        });
-    });
-
-    describe('@when', function() {
-        it('works without properties', function (done) {
-            test('@component ComponentName {@when stateName {}}', '.ComponentName {}\n.ComponentName.is-stateName {}', {}, done);
-        });
-
-        it('works with properties', function (done) {
-            test('@component ComponentName {color: red; text-align: right; @when stateName {color: blue; text-align: left;}}', '.ComponentName {\n    color: red;\n    text-align: right\n}\n.ComponentName.is-stateName {\n    color: blue;\n    text-align: left\n}', {}, done);
-        });
-
-        it('can be used in any selector', function (done) {
-            test('.ComponentName {color: red; text-align: right; @when stateName {color: blue; text-align: left;}}', '.ComponentName {color: red; text-align: right}\n.ComponentName.is-stateName {color: blue;text-align: left}', {}, done);
-        });
-
-        it('can not be used in root', function (done) {
-            testErrors('@when stateName {color: blue; text-align: left;}', '@when can only be used in rules which are not the root node', {}, done);
+        describe('@when', function() {
+            it('does nothing', function (done) {
+                test('@component component-name {@when stateName {}}', '.component-name {\n    @when stateName {}\n}', useBem, done);
+            });
         });
     });
 });

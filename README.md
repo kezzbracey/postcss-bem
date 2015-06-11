@@ -71,7 +71,10 @@
 ## Usage
 
 ```js
-postcss([ require('postcss-bem') ])
+postcss([ require('postcss-bem')({
+    defaultNamespace: undefined, // default namespace to use, none by default
+    style: 'suit' // suit or bem, suit by default
+}) ])
 ```
 
 See [PostCSS] docs for examples for your environment.

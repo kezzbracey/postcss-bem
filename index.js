@@ -1,13 +1,40 @@
 var postcss = require('postcss');
+var config = {
+    suit: {
+        separators: {
+            namespace: '-',
+            descendent: '-',
+            modifier: '--',
+            state: '.is-'
+        }
+    },
+    bem: {
+        separators: {
+            namespace: '--',
+            descendent: '__',
+            modifier: '_'
+        }
+    }
+};
 
 module.exports = postcss.plugin('postcss-bem', function (opts) {
     opts = opts || {};
+
+    if (!opts.style) {
+        opts.style = 'suit';
+    }
+
+    if (opts.style !== 'suit' && opts.style !== 'bem') {
+        throw new Error('postcss-bem: opts.style may only be "suit" or "bem"');
+    }
+
+    var currentConfig = config[opts.style];
 
     function processComponent (component, namespace) {
         var name = component.params;
 
         if (namespace) {
-            name = namespace + '-' + name;
+            name = namespace + currentConfig.separators.namespace + name;
         }
 
         var last = component;
@@ -21,9 +48,9 @@ module.exports = postcss.plugin('postcss-bem', function (opts) {
 
             if (rule.type === 'atrule') {
                 if (rule.name === 'modifier') {
-                    separator = '--';
+                    separator = currentConfig.separators.modifier;
                 } else if (rule.name === 'descendent') {
-                    separator = '-';
+                    separator = currentConfig.separators.descendent;
                 }
 
                 if(separator) {
@@ -50,55 +77,57 @@ module.exports = postcss.plugin('postcss-bem', function (opts) {
     return function (css, result) {
         var namespaces = {};
 
-        css.eachAtRule('utility', function (utility) {
-            if (!utility.params) {
-                throw utility.error('No names supplied to @utility');
-            }
-
-            var utilityNames = postcss.list.comma(utility.params);
-
-            var selector = utilityNames.map(function (params) {
-                params = postcss.list.space(params);
-                var variant;
-                var name;
-
-                if (params.length > 2) {
-                    result.warn('Too many parameters for @utility', {
-                        node: utility
-                    });
+        if (opts.style === 'suit') {
+            css.eachAtRule('utility', function (utility) {
+                if (!utility.params) {
+                    throw utility.error('No names supplied to @utility');
                 }
 
-                name = 'u-';
-                if (params.length > 1) {
-                    variant = params[1];
+                var utilityNames = postcss.list.comma(utility.params);
 
-                    if (variant === 'small') {
-                        name += 'sm';
-                    } else if (variant === 'medium') {
-                        name += 'md';
-                    } else if (variant === 'large') {
-                        name += 'lg';
-                    } else {
-                        result.warn('Unknown variant: ' + variant, {
+                var selector = utilityNames.map(function (params) {
+                    params = postcss.list.space(params);
+                    var variant;
+                    var name;
+
+                    if (params.length > 2) {
+                        result.warn('Too many parameters for @utility', {
                             node: utility
                         });
                     }
-                    name += '-';
-                }
-                name += params[0];
-                return '.' + name;
-            }).join(', ');
 
-            var newUtility = postcss.rule({
-                selector: selector,
-                source: utility.source
-            });
+                    name = 'u-';
+                    if (params.length > 1) {
+                        variant = params[1];
 
-            utility.each(function (node) {
-                node.moveTo(newUtility);
+                        if (variant === 'small') {
+                            name += 'sm';
+                        } else if (variant === 'medium') {
+                            name += 'md';
+                        } else if (variant === 'large') {
+                            name += 'lg';
+                        } else {
+                            result.warn('Unknown variant: ' + variant, {
+                                node: utility
+                            });
+                        }
+                        name += '-';
+                    }
+                    name += params[0];
+                    return '.' + name;
+                }).join(', ');
+
+                var newUtility = postcss.rule({
+                    selector: selector,
+                    source: utility.source
+                });
+
+                utility.each(function (node) {
+                    node.moveTo(newUtility);
+                });
+                utility.replaceWith(newUtility);
             });
-            utility.replaceWith(newUtility);
-        });
+        }
 
         css.eachAtRule('component-namespace', function (namespace) {
             var name = namespace.params;
@@ -131,30 +160,32 @@ module.exports = postcss.plugin('postcss-bem', function (opts) {
             processComponent(component, namespace);
         });
 
-        css.eachAtRule('when', function (when) {
-            var parent = when.parent;
+        if (opts.style === 'suit') {
+            css.eachAtRule('when', function (when) {
+                var parent = when.parent;
 
-            if (parent === css || parent.type !== 'rule') {
-                throw when.error('@when can only be used in rules which are not the root node');
-            }
+                if (parent === css || parent.type !== 'rule') {
+                    throw when.error('@when can only be used in rules which are not the root node');
+                }
 
-            var states = when.params;
-            var newSelector = postcss.list.comma(parent.selector).map(function (selector) {
-                return postcss.list.comma(states).map(function (state) {
-                    return selector + '.is-' + state;
+                var states = when.params;
+                var newSelector = postcss.list.comma(parent.selector).map(function (selector) {
+                    return postcss.list.comma(states).map(function (state) {
+                        return selector + currentConfig.separators.state + state;
+                    }).join(', ');
                 }).join(', ');
-            }).join(', ');
 
-            var newWhen = postcss.rule({
-                selector: newSelector,
-                source: when.source
-            });
+                var newWhen = postcss.rule({
+                    selector: newSelector,
+                    source: when.source
+                });
 
-            when.each(function (node) {
-                node.moveTo(newWhen);
+                when.each(function (node) {
+                    node.moveTo(newWhen);
+                });
+                newWhen.moveAfter(parent);
+                when.removeSelf();
             });
-            newWhen.moveAfter(parent);
-            when.removeSelf();
-        });
+        }
     };
 });
