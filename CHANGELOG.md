@@ -1,3 +1,7 @@
+3.0.0 (2015-06-11)
+  - Rename `@namespace` to `@component-namespace` (#2)
+  - Add BEM support (#2)
+
 2.0.0 (2015-06-10)
   - Separate utility name in `@utility` rules from variant by space instead of
       comma
