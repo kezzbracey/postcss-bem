@@ -31,7 +31,7 @@
     }
 }
 
-@namespace nmsp {
+@component-namespace nmsp {
     @component ComponentName {
         color: red;
     }

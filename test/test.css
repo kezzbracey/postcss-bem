@@ -27,7 +27,7 @@
     }
 }
 
-@namespace nmsp {
+@component-namespace nmsp {
     @component ComponentName { /* .nmsp-ComponentName */
 
     }

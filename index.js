@@ -100,7 +100,7 @@ module.exports = postcss.plugin('postcss-bem', function (opts) {
             utility.replaceWith(newUtility);
         });
 
-        css.eachAtRule('namespace', function (namespace) {
+        css.eachAtRule('component-namespace', function (namespace) {
             var name = namespace.params;
 
             if (!namespace.nodes) {

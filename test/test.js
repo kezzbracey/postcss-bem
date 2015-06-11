@@ -83,9 +83,9 @@ describe('postcss-bem', function () {
         });
     });
 
-    describe('@namespace', function () {
+    describe('@component-namespace', function () {
         it('should get removed when empty', function (done) {
-            test('@namespace nmsp {}', '', {}, done);
+            test('@component-namespace nmsp {}', '', {}, done);
         });
     });
 
@@ -98,12 +98,12 @@ describe('postcss-bem', function () {
             test('@component ComponentName {color: red; text-align: right;}', '.ComponentName {\n    color: red;\n    text-align: right\n}', {}, done);
         });
 
-        it('works in @namespace', function (done) {
-            test('@namespace nmsp {@component ComponentName {color: red; text-align: right;}}', '.nmsp-ComponentName {\n    color: red;\n    text-align: right\n}', {}, done);
+        it('works in @component-namespace', function (done) {
+            test('@component-namespace nmsp {@component ComponentName {color: red; text-align: right;}}', '.nmsp-ComponentName {\n    color: red;\n    text-align: right\n}', {}, done);
         });
 
-        it('works after file-level @namespace', function (done) {
-            test('@namespace nmsp; @component ComponentName {color: red; text-align: right;}', '.nmsp-ComponentName {\n    color: red;\n    text-align: right\n}', {}, done);
+        it('works after file-level @component-namespace', function (done) {
+            test('@component-namespace nmsp; @component ComponentName {color: red; text-align: right;}', '.nmsp-ComponentName {\n    color: red;\n    text-align: right\n}', {}, done);
         });
 
         it('works with default namespace', function (done) {
@@ -112,8 +112,8 @@ describe('postcss-bem', function () {
             }, done);
         });
 
-        it('works in @namespace with default namespace', function (done) {
-            test('@namespace nmsp {@component ComponentName {color: red; text-align: right;}}', '.nmsp-ComponentName {\n    color: red;\n    text-align: right\n}', {
+        it('works in @component-namespace with default namespace', function (done) {
+            test('@component-namespace nmsp {@component ComponentName {color: red; text-align: right;}}', '.nmsp-ComponentName {\n    color: red;\n    text-align: right\n}', {
                 defaultNamespace: 'nmmmmsp'
             }, done);
         });
